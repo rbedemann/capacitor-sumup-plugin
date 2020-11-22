@@ -25,12 +25,113 @@
 
 ## Installation
 
-TODO
+### Web application
 
-## Configuration
+1. Add plugin to your dependencies
 
-TODO
+    with yarn
+    ```shell script
+    yarn add @capacitor-community/sumup
+    ```
+    or
+    npm
+    ```shell script
+    npm i -S @capacitor-community/sumup
+    ```
+
+2. Import Plugin in your code
+
+    ```typescript
+    import { Plugins } from '@capacitor/core';
+    
+    const { SumUp } = Plugins;
+    ```
+
+### Android
+
+1. Setup SumUp Maven repository
+
+    In `app/build.gradle` add following lines:
+    
+    ```groovy
+    allprojects {
+       repositories {
+          maven { url 'https://maven.sumup.com/releases' }
+       }
+    }
+    ```
+
+2. Add Plugin to your app's MainActivity
+
+    In Java:
+    ```java
+    public class MainActivity extends BridgeActivity {
+      @Override
+      public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    
+        // Initializes the Bridge
+        this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {{
+          // Additional plugins you've installed go here
+          // Ex: add(TotallyAwesomePlugin.class);
+          add(SumUp.class);
+        }});
+      }
+    }
+    ```
+    
+    Or Kotlin:
+    
+    ```kotlin
+    class MainActivity : BridgeActivity() {
+        public override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+    
+            // Initializes the Bridge
+            this.init(savedInstanceState, object : ArrayList<Class<out Plugin?>?>() {
+                init {
+                    // Additional plugins you've installed go here
+                    // Ex: add(TotallyAwesomePlugin.class);
+                    add(SumUp::class.java)
+                }
+            })
+        }
+    }
+    ```
 
 ## Usage
 
-TODO
+1. Login 
+   ```typescript
+   SumUp.login({
+     affiliateKey: "<< YOUR AFFILIATE KEY >>",
+   
+     // optional: Login Screen will be shown every time, if not provided
+     accessToken: "<< ACCESS TOKEN >>",
+   })
+   .then((loginResponse: SumUpResponse) => {})
+   ```
+   Get your affiliate key [here](https://me.sumup.com/developers) and
+   find out more about how to generate an access token in SumUps official [documentation](https://developer.sumup.com/rest-api/#section/Authentication)
+
+2. Initiate a checkoout (Login required)
+    ```typescript
+    SumUp.checkout(
+       {
+          title: 'Test checkout', 
+          total: 100.50, 
+          currency: 'EUR',   
+          skipSuccessScreen: true,
+          additionalInfo: {
+            title: 'Booking 1'
+          }
+       } as CheckoutOptions
+   ).then((r: SumUpResponse) => {
+     // Checkout completed           
+   })
+   .catch((r: SumUpResponse) => {   
+     // Checkout failed
+   })
+   ```
+   Find a detailed description of possible parameters in SumUp's [documentation](https://github.com/sumup/sumup-android-sdk#4-make-a-payment).
+
