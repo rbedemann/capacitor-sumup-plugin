@@ -1,5 +1,6 @@
 import { WebPlugin } from '@capacitor/core';
-import { SumUpPlugin } from './definitions';
+import { LoginOptions, SumUpPlugin, SumUpResponse } from './definitions';
+import { registerWebPlugin } from '@capacitor/core';
 
 export class SumUpWeb extends WebPlugin implements SumUpPlugin {
   constructor() {
@@ -9,15 +10,16 @@ export class SumUpWeb extends WebPlugin implements SumUpPlugin {
     });
   }
 
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  login(options: LoginOptions): Promise<SumUpResponse> {
+    console.debug(options)
+    return Promise.resolve({
+      code: 0,
+      message: 'Not available in web'
+    });
   }
 }
 
 const SumUp = new SumUpWeb();
 
 export { SumUp };
-
-import { registerWebPlugin } from '@capacitor/core';
 registerWebPlugin(SumUp);

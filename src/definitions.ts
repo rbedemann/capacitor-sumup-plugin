@@ -4,6 +4,16 @@ declare module '@capacitor/core' {
   }
 }
 
+export interface SumUpResponse {
+  code: number,
+  message: string
+}
+
+export interface LoginOptions {
+  affiliateKey: string,
+  accessToken?: string,
+}
+
 export interface SumUpPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  login(options: LoginOptions): Promise<SumUpResponse>;
 }
