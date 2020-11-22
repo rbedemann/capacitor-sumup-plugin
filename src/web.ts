@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { LoginOptions, SumUpPlugin, SumUpResponse } from './definitions';
+import { CheckoutOptions, LoginOptions, SumUpPlugin, SumUpResponse } from './definitions';
 import { registerWebPlugin } from '@capacitor/core';
 
 export class SumUpWeb extends WebPlugin implements SumUpPlugin {
@@ -11,6 +11,14 @@ export class SumUpWeb extends WebPlugin implements SumUpPlugin {
   }
 
   login(options: LoginOptions): Promise<SumUpResponse> {
+    console.debug(options)
+    return Promise.resolve({
+      code: 0,
+      message: 'Not available in web'
+    });
+  }
+
+  checkout(options: CheckoutOptions): Promise<SumUpResponse> {
     console.debug(options)
     return Promise.resolve({
       code: 0,

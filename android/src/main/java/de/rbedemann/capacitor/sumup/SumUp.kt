@@ -12,6 +12,7 @@ import java.math.BigDecimal
 
 enum class RequestCodes(val code: Int) {
     LOGIN(1),
+    CHECKOUT(2)
 }
 
 const val TAG = "Capacitor:SumUpPlugin"
@@ -42,6 +43,49 @@ class SumUp : Plugin() {
         SumUpAPI.openLoginActivity(activity, sumupLogin.build(), RequestCodes.LOGIN.code)
     }
 
+    @PluginMethod
+    fun checkout(call: PluginCall) {
+        Log.i(TAG, "checkout started")
+        saveCall(call)
+
+        val payment = SumUpPayment
+                .builder()
+                .total(BigDecimal(call.data.getDouble("total")))
+                .currency(SumUpPayment.Currency.valueOf(call.data.getString("currency")))
+
+        if (call.data.has("title")) {
+            payment.title(call.data.getString("title"))
+        }
+
+        if (call.data.has("receiptEmail")) {
+            payment.receiptEmail(call.data.getString("receiptEmail"))
+        }
+
+        if (call.data.has("receiptSMS")) {
+            payment.receiptSMS(call.data.getString("receiptSMS"))
+        }
+
+        if (call.data.has("additionalInfo")) {
+            val additionalInfoLines = call.data.getJSObject("additionalInfo")
+
+            additionalInfoLines
+                    .keys().forEach {
+                        payment.addAdditionalInfo(it, additionalInfoLines.getString(it))
+                    }
+
+        }
+
+        if (call.data.has("foreignTransactionId")) {
+            payment.foreignTransactionId(call.data.getString("foreignTransactionId"))
+        }
+
+        if (call.data.optBoolean("skipSuccessScreen")) {
+            payment.skipSuccessScreen()
+        }
+
+        SumUpAPI.checkout(null, payment.build(), RequestCodes.CHECKOUT.code)
+    }
+
     override fun handleOnActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.handleOnActivityResult(requestCode, resultCode, data)
 
@@ -50,7 +94,7 @@ class SumUp : Plugin() {
         val sumUpResultCode = data.extras?.getInt(SumUpAPI.Response.RESULT_CODE)
         val sumUpResultMessage = data.extras?.getString(SumUpAPI.Response.MESSAGE)
 
-        if (requestCode == RequestCodes.LOGIN.code) {
+        if (requestCode == RequestCodes.LOGIN.code || requestCode == RequestCodes.CHECKOUT.code) {
             val result = JSObject()
             result.put("code", sumUpResultCode)
             result.put("message", sumUpResultMessage)
@@ -58,7 +102,7 @@ class SumUp : Plugin() {
             if (resultCode > 0) {
                 savedCall.resolve(result)
             } else {
-                savedCall.reject(sumUpResultMessage, sumUpResultCode.toString() )
+                savedCall.reject(sumUpResultMessage, sumUpResultCode.toString())
             }
         }
     }
